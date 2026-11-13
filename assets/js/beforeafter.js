@@ -2,7 +2,8 @@
    Big screens with a mouse: the section pins while you scroll; a divider sweeps across and spreadsheet
    cells fly into the app (broken values get fixed in flight). The divider can also be dragged, or moved
    with the arrow keys.
-   Phones and tablets: a Before/After switch (or a swipe) plays a short version of the same change.
+   Phones and tablets: the same change runs as the example scrolls up the screen (no pinning).
+   The Before/After switch or a swipe also plays it, and takes over until the section leaves the screen.
    Reduced motion or no JavaScript: both states shown side by side (the CSS default).
    The "Send invoice" demo button works in every mode. */
 (function () {
@@ -65,7 +66,7 @@
     });
   }
 
-  var state = { p: 0, manual: false, revealed: false };
+  var state = { p: 0, manual: false, dragged: false, revealed: false };
 
   function setSplit(pct) {
     stage.style.setProperty('--split', pct + '%');
@@ -119,7 +120,7 @@
 
   /* Manual divider (drag / keys): everything has landed, you just choose how much of each side to see */
   function manualSplit(pct) {
-    state.manual = true;
+    state.manual = true; state.dragged = true;
     flyers(1); reveal(true);
     pct = Math.max(0, Math.min(100, pct));
     setSplit(pct);
@@ -130,19 +131,33 @@
   var pinned = false, ticking = false, anim = 0;
 
   function trackProgress() {
+    var vh = window.innerHeight;
+    if (!pinned) {
+      // Phones and tablets: no pinning. The change runs as the example moves up the screen,
+      // from its top edge at 85% of the screen height to 30%.
+      var s = stage.getBoundingClientRect(), start = vh * 0.85, end = vh * 0.3;
+      return clamp01((start - s.top) / (start - end));
+    }
     var r = track.getBoundingClientRect();
-    var total = r.height - window.innerHeight;
+    var total = r.height - vh;
     return total > 0 ? clamp01(-r.top / total) : 0;
   }
   function onScroll() {
-    if (!pinned || state.manual || ticking) return;
+    if (state.manual) {
+      // The switch or the divider is in charge until the section has left the screen
+      var rr = root.getBoundingClientRect();
+      if (rr.bottom > 0 && rr.top < window.innerHeight) return;
+      cancelAnimationFrame(anim); state.manual = false; state.dragged = false;
+    }
+    if (ticking) return;
     ticking = true;
     requestAnimationFrame(function () { ticking = false; render(trackProgress()); });
   }
 
   function animateTo(target) {
     cancelAnimationFrame(anim);
-    state.manual = false;
+    state.manual = true;   // the switch or a swipe takes over until the section leaves the screen
+    state.dragged = false;
     var from = state.p, t0 = null, ms = 1300 * Math.abs(target - from) + 200;
     function frame(t) {
       if (t0 === null) t0 = t;
@@ -197,27 +212,27 @@
   }, { passive: true });
   stage.addEventListener('pointercancel', function () { sx = null; });
 
-  /* Mode: pinned scroll on big screens with a mouse, switch + swipe elsewhere */
+  /* Mode: pinned scroll on big screens with a mouse; elsewhere scroll-linked without pinning, plus switch + swipe */
   function setMode() {
     pinned = pinMQ.matches;
     root.classList.toggle('ba--pin', pinned);
     state.manual = false;
     requestAnimationFrame(function () {
       measure();
-      if (pinned) render(trackProgress()); else render(state.p >= 0.5 ? 1 : 0);
+      render(trackProgress());
     });
   }
   if (pinMQ.addEventListener) pinMQ.addEventListener('change', setMode); else if (pinMQ.addListener) pinMQ.addListener(setMode);
 
   window.addEventListener('scroll', onScroll, { passive: true });
   var rm = 0;
-  var remeasure = function () { cancelAnimationFrame(rm); rm = requestAnimationFrame(function () { measure(); if (state.manual) flyers(1); else render(state.p); }); };
+  var remeasure = function () { cancelAnimationFrame(rm); rm = requestAnimationFrame(function () { measure(); if (state.dragged) flyers(1); else render(state.p); }); };
   if ('ResizeObserver' in window) new ResizeObserver(remeasure).observe(stage); else window.addEventListener('resize', remeasure);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(remeasure);
 
   /* When the section is scrolled fully away, hand control back to scrolling */
   (C.watch || function () {})(root, function (v) {
-    if (!v && state.manual) { state.manual = false; if (pinned) render(trackProgress()); }
+    if (!v && state.manual) { cancelAnimationFrame(anim); state.manual = false; state.dragged = false; render(trackProgress()); }
   }, '0px');
 
   setMode();
