@@ -63,6 +63,9 @@
 <script src="assets/js/dotfield.js" defer></script>
 <script src="assets/js/livestrip.js" defer></script>
 <script src="assets/js/beforeafter.js" defer></script>
+<script src="assets/js/picker.js" defer></script>
+<script src="assets/js/polish.js" defer></script>
+<script src="assets/js/footerdots.js" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -253,6 +256,36 @@
     </div>
   </section>
 
+  <!-- WHAT DO YOU NEED? · interaction C -->
+  <section class="section picker" id="picker" data-picker aria-labelledby="picker-h">
+    <div class="wrap">
+      <p class="label">What do you need?</p>
+      <h2 id="picker-h">Pick what sounds <em>like your business.</em></h2>
+      <div class="pick-layout">
+        <div class="chips" role="group" aria-label="What sounds like your business? Pick one or more">
+          <button type="button" class="chip" aria-pressed="false" data-need="sheets"><span class="chip-box" aria-hidden="true"></span>I live in spreadsheets</button>
+          <button type="button" class="chip" aria-pressed="false" data-need="website"><span class="chip-box" aria-hidden="true"></span>I need a website</button>
+          <button type="button" class="chip" aria-pressed="false" data-need="reports"><span class="chip-box" aria-hidden="true"></span>Reports take me hours</button>
+          <button type="button" class="chip" aria-pressed="false" data-need="tools"><span class="chip-box" aria-hidden="true"></span>My tools don't talk to each other</button>
+          <button type="button" class="chip" aria-pressed="false" data-need="ai"><span class="chip-box" aria-hidden="true"></span>I want to use AI</button>
+          <button type="button" class="chip" aria-pressed="false" data-need="else"><span class="chip-box" aria-hidden="true"></span>Something else</button>
+        </div>
+        <div class="pick-card">
+          <canvas class="pick-mock" aria-hidden="true"></canvas>
+          <div class="pick-body" aria-live="polite">
+            <p class="pick-k">Likely solution</p>
+            <h3 class="pick-title" data-pick-title>Not sure what you need?</h3>
+            <ul class="pick-list" data-pick-list>
+              <li>Email a few lines about what's slowing your business down. You'll get an answer in plain language.</li>
+            </ul>
+            <p class="pick-time"><span class="pick-k">Typical timeline</span> <span data-pick-time>Agreed in the proposal, before work starts</span></p>
+          </div>
+          <a class="btn btn-main pick-send" href="mailto:hello@cuss.ie?subject=Project%20enquiry" data-pick-send>Send this to CuSS</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ABOUT -->
   <section class="section" id="about" aria-labelledby="about-h">
     <div class="wrap split">
@@ -297,7 +330,7 @@
 </main>
 
 <footer class="site-footer">
-  <div class="wordmark" aria-hidden="true">CuSS</div>
+  <div class="wordmark" aria-hidden="true" data-footerdots><span class="wordmark-text">CuSS</span><canvas class="wordmark-canvas"></canvas></div>
   <div class="wrap legal">
     <p>CuSS Custom Software Solutions is the registered business name (CRO no. 797449) of Emil Stefan Ghimici, sole trader.</p>
     <p>5 Garden Lodge, Court Devenish, Athlone, Co. Westmeath, N37 KV57, Ireland · <a href="mailto:hello@cuss.ie">hello@cuss.ie</a></p>
