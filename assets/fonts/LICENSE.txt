@@ -1,4 +1,5 @@
 Fonts in this folder are free fonts from Google Fonts, used under the SIL Open Font License 1.1
 (https://openfontlicense.org):
 - Bricolage Grotesque (by Mathieu Triay)
+- Doto
 - IBM Plex Sans and IBM Plex Mono (by IBM)
